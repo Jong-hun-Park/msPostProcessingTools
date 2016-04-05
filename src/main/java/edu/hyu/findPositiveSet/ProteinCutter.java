@@ -1,4 +1,4 @@
-package edu.hyu.findPositiveSet;
+package edu.hyu.findpositiveset;
 
 import java.util.ArrayList;
 import java.util.HashSet;

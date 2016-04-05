@@ -1,8 +1,8 @@
-package edu.hyu;
+package postprocessingtest;
 
 import java.io.IOException;
 
-import edu.hyu.postProcessing.MakeUnidentifiedSpectra;
+import edu.hyu.postprocessing.MakeUnidentifiedSpectra;
 
 public class PostProcessingTest {
 

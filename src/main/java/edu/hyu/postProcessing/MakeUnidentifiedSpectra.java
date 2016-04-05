@@ -1,4 +1,4 @@
-package edu.hyu.postProcessing;
+package edu.hyu.postprocessing;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -1,4 +1,4 @@
-package edu.hyu.findPositiveSet;
+package edu.hyu.findpositiveset;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -45,6 +45,7 @@ public class findPositiveSet {
     /*
      * read protein sequences from input file.
      */
+    
     //TODO: protein seq check? only alphabet. assert
     //String[] proteins = new String[2];
     //proteins[1] = "ABCDASDFKASDFKQSDSADFFKRAFDFASDFKASDFASDFEREASDFRASDF";
