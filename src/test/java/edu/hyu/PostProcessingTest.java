@@ -2,7 +2,9 @@ package edu.hyu;
 
 import java.io.IOException;
 
-public class Tester {
+import edu.hyu.postProcessing.MakeUnidentifiedSpectra;
+
+public class PostProcessingTest {
 
   public static void main(String[] args) {
     

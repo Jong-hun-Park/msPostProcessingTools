@@ -1,4 +1,4 @@
-package edu.hyu;
+package edu.hyu.postProcessing;
 
 public class SearchResult {
 	
