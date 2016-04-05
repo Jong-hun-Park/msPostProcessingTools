@@ -49,7 +49,7 @@ public class ProteinCutter {
         endIndex = i;
         
         if (missedCleavageCount == missCleavageSize){
-          if ( endIndex - startIndex >= minPeptideLength){
+          if ( endIndex - startIndex + 1 >= minPeptideLength){
             peptideSequences.add(proteinSeq.substring(startIndex, endIndex + 1));
           }
           missedCleavageCount = 0;

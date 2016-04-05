@@ -1,23 +1,37 @@
 package proteincuttertest;
 
 import java.lang.Object;
+import java.util.HashSet;
 
 import edu.hyu.findpositiveset.ProteinCutter;;
 
 public class ProteinCutterTest {
   
-  public void main (String args[]){
+  public static void main (String[] args){
     
     testProteinCutter();
   }
   
-  public void testProteinCutter(){
-    ProteinCutter proCutter = new ProteinCutter();
+  public static void testProteinCutter(){
+    
+    HashSet<String> peptideSequenceSet = new HashSet();
     
     int missCleavageSize = 2;
     int minPeptideLength = 8;
-    String proteinSeq = "AAAAAAARAAAAAAARAAAAAAARAAAAAAARAAAAAAA";
+    String proteinSeq = "AAAAAAAR"
+                      + "AAAAAAAR"
+                      + "AAAAAAAR"
+                      + "AAAAAAAR"
+                      + "AAAAAAR"
+                      + "AAAAAAR";
     
-    proCutter.findFullyTrypticPeptideSequences(proteinSeq, missCleavageSize, minPeptideLength);
+    ProteinCutter proCutter = new ProteinCutter();
+    
+    for (int i = 0; i <= missCleavageSize; i ++){
+      peptideSequenceSet.addAll(proCutter.findFullyTrypticPeptideSequences(proteinSeq, i, minPeptideLength));
+      
+    }
+    
+    System.out.println(peptideSequenceSet);
   }
 }
