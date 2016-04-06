@@ -1,7 +1,6 @@
 package edu.hyu.findpositiveset;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /*
  * Calculate the number of peptide, where the constraints are given.
@@ -37,7 +36,7 @@ public class ProteinCutter {
         endIndex = i;
         
         if (missedCleavageCount == missCleavageSize){
-          if (endIndex - startIndex >= minPeptideLength){
+          if (endIndex - startIndex + 1 >= minPeptideLength){
             peptideSequences.add(proteinSeq.substring(startIndex, endIndex + 1));
           }
         }

@@ -18,17 +18,30 @@ public class ProteinCutterTest {
     
     int missCleavageSize = 2;
     int minPeptideLength = 8;
-    String proteinSeq = "AAAAAAAR"
-                      + "AAAAAAAR"
-                      + "AAAAAAAR"
-                      + "AAAAAAAR"
-                      + "AAAAAAR"
-                      + "AAAAAAR";
+    String proteinSeq  = "AAAAAAAR"
+                       + "AAAAAAAR"
+                       + "AAAAAAAR"
+                       + "AAAAAAAR"
+                       + "AAAAAAR"
+                       + "AAAAAAR";
+    String proteinSeq2 = "AAAAAAAR"
+                       + "AAAAAAAR"
+                       + "AAAAAAAR"
+                       + "AAAAAAAR"
+                       + "AAAAAAR"
+                       + "AAAAAABR";
     
     ProteinCutter proCutter = new ProteinCutter();
     
     for (int i = 0; i <= missCleavageSize; i ++){
       peptideSequenceSet.addAll(proCutter.findFullyTrypticPeptideSequences(proteinSeq, i, minPeptideLength));
+      
+    }
+    System.out.println(peptideSequenceSet);
+    
+    //proteinSeq2 test
+    for (int i = 0; i <= missCleavageSize; i ++){
+      peptideSequenceSet.addAll(proCutter.findFullyTrypticPeptideSequences(proteinSeq2, i, minPeptideLength));
       
     }
     
