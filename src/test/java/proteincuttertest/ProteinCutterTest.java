@@ -3,7 +3,7 @@ package proteincuttertest;
 import java.lang.Object;
 import java.util.HashSet;
 
-import edu.hyu.findpositiveset.ProteinCutter;;
+import edu.hyu.findset.ProteinCutter;;
 
 public class ProteinCutterTest {
   

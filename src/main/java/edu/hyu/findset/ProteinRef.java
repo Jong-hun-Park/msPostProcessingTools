@@ -1,4 +1,4 @@
-package edu.hyu.findpositiveset;
+package edu.hyu.findset;
 
 public class ProteinRef {
  

@@ -3,10 +3,10 @@ package edu.hyu.postprocessing;
 public class SearchResult {
 	
 	//TODO: add other values if you need to store.
-	String fileName;
-	int index;
-	String title;
-	String charge;
+	private String fileName;
+	private int index;
+	private String title;
+	private String charge;
 	
 	public SearchResult (String fileName, int index){
 		this.fileName = fileName;

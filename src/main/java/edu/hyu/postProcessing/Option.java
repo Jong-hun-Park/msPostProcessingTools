@@ -12,8 +12,9 @@ public class Option {
 
 	public Option(String flag, String paramValue) {
 		
-		this.flag = flag;
-		this.paramValue = paramValue;
+	  this.flag = flag;
+	  //TODO: Option error check. (enum check)
+	  this.paramValue = paramValue;
 		
 	}
 }

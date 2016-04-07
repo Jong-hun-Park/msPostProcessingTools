@@ -1,4 +1,4 @@
-package edu.hyu.findpositiveset;
+package edu.hyu.findset;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -6,8 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
-public class findPositiveSet {
+public class FindPeptideSet {
   
   static int maxMissCleavage = 2;
   static int minPeptideLength = 8;
@@ -16,7 +17,7 @@ public class findPositiveSet {
 
     String proteinSeq = "";
     int proteinCount = 0; //need to test.
-    HashSet<String> peptideSequenceSet = new HashSet();
+    Set<String> peptideSequenceSet = new HashSet();
     ProteinCutter proCutter = new ProteinCutter();
     
     FileReader fr;
