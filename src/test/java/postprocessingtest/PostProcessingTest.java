@@ -2,7 +2,7 @@ package postprocessingtest;
 
 import java.io.IOException;
 
-import edu.hyu.postprocessing.MakeUnidentifiedSpectra;
+import postprocessing.MakeUnidentifiedSpectra;
 
 public class PostProcessingTest {
 

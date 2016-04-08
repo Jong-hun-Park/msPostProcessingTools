@@ -1,4 +1,4 @@
-package edu.hyu.postprocessing;
+package postprocessing;
 
 import java.io.FileReader;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package edu.hyu.postprocessing;
+package postprocessing;
 
 /*
  * Parameterized Options

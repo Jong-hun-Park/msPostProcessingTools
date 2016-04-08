@@ -1,4 +1,4 @@
-package edu.hyu.findset;
+package findset;
 
 import java.util.ArrayList;
 
