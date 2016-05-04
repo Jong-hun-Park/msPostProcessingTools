@@ -21,7 +21,7 @@ import java.util.List;
 public class ToLuciphor {
   private static final boolean isMODplusFormat = true;
   
-  static String FILE_DELIMITER = "\t";
+  static String RESULT_FILE_DELIMITER = "\t";
   
   public static void main(String[] args) {
     String resultFileName = "Swissprot.txt";
@@ -36,21 +36,25 @@ public class ToLuciphor {
   }
 
   /*
-   * Change format to LuciPHOr MSGF Format
+   * Change format to LuciPHOr Format
    * 
+   * MODplus Format is like
    * SpectrumFile \t Index \t ObservedMW \t Charge \t CalculatedMW \t DeltaMass \t Score \t
    * Probability(EValue) \t Peptide \t Protein \t Modification \t ScanNum
    * 
-   * LuciPHOr Format srcFile \t scanNum \t charge \t PSMscore \t peptide \t modSites
-   *
+   * LuciPHOr Format is like
+   * srcFile \t scanNum \t charge \t PSMscore \t peptide \t modSites
+   * 
+   * @param resultFileName
    */
   private static void changeFormatForLuciphor(String resultFileName) throws IOException {
-    String outputFileName = resultFileName.substring(0, resultFileName.lastIndexOf(".")) + ".formated.tsv";
+    String outputFileName = resultFileName.substring(0, resultFileName.lastIndexOf(".")) + ".Luciphor_formated.tsv";
     
     // Load File
     BufferedReader resultFile = new BufferedReader(new FileReader(resultFileName));
     BufferedWriter outputFile = new BufferedWriter( new PrintWriter(outputFileName));
     
+    //Initialization
     String spectrumFile     = "";
     int index               = -1;
     float observedMW        = -1;
@@ -78,9 +82,9 @@ public class ToLuciphor {
     String stipPeptideSeq = "";
     String modSite = "";
     
-    while ((psmLine = resultFile.readLine()) != null){
+    while ((psmLine = resultFile.readLine()) != null) {
       
-      psmColumn = psmLine.trim().split(FILE_DELIMITER);
+      psmColumn = psmLine.trim().split(RESULT_FILE_DELIMITER);
       
       spectrumFile     = psmColumn[0];
       index            = Integer.parseInt(psmColumn[1]);
@@ -98,22 +102,19 @@ public class ToLuciphor {
       stipPeptideSeq = getStripPeptideSeq(peptideSequence);
       modSite = getModSite(peptideSequence, modification);
       
-      outputFile.write(spectrumFile + "\t" +
-                   scanNum      + "\t" +
-                   charge       + "\t" +
-                   probability  + "\t" +
-                   stipPeptideSeq + "\t" +
-                   modSite     + "\n"
-                   );
-          
+      String[] splitedScanNum = scanNum.split("\\.");
+      scanNum = splitedScanNum[1];
+      
+      outputFile.write(spectrumFile   + "\t" +
+                       scanNum        + "\t" +
+                       charge         + "\t" +
+                       probability    + "\t" +
+                       stipPeptideSeq + "\t" +
+                       modSite        + "\n");
     }
     
     resultFile.close();
     outputFile.close();
-    
-    
-
-
   }
 
   private static String getStripPeptideSeq(String peptideSequence) {
@@ -124,10 +125,10 @@ public class ToLuciphor {
      * index from 2 to (length - 2)
      * Except pre and post (K.SEQUENCE.K)
      */
-    if (isMODplusFormat){
-      for (int i = 2; i < peptideSequence.length() - 2; i++){
-        if (Character.isLetter(peptideSequence.charAt(i))){
-          stripPeptideSequence.append(peptideSequence.charAt(i)); 
+    if (isMODplusFormat) {
+      for (int i = 2; i < peptideSequence.length() - 2; i++) {
+        if (Character.isLetter(peptideSequence.charAt(i))) {
+          stripPeptideSequence.append(peptideSequence.charAt(i));
         }
       }
     }
@@ -138,14 +139,14 @@ public class ToLuciphor {
   
   private static String getModSite(String peptideSequence, String modification) {
     // When no modification
-    if (modification.equals("")){
+    if (modification.equals("")) {
       return "";
     }
     
-    /* MODplus result
-     * Modification example: Oxidation(M1) Phospho(S10), space delimiter
+    /* MODplus Modification Column is like
+     * Oxidation(M1) Phospho(S10), which has space delimiter
      */
-    if (isMODplusFormat){
+    if (isMODplusFormat) {
       peptideSequence = peptideSequence.substring(2, peptideSequence.length() -2); //K. SEQUENCE . R
     }
     String modSiteString = modification.replaceAll("[^0-9]+", " ");
@@ -155,32 +156,21 @@ public class ToLuciphor {
     List<String> modMassArray = Arrays.asList(modMassString.trim().split(" "));
     
     assert modSiteArray.size() == modMassArray.size() : "should be the same modification size";
-    
     /*
      * LuciPHOr requires comma-delimited. The first residue in a peptide is position 0 and the rest
      * increment from there. For N-terminal or C-terminal modifications use -100 or 100 respectively
      * for the value of 'pos' and then list the mass shift of the terminal modification.
      * 
-     * -100=42.010565 
-     * 2=160.030649,4=160.030649
+     * only N-term -100=42.010565 
+     * other site 2=160.030649,4=160.030649
      */
     StringBuilder sb = new StringBuilder(6 * modSiteArray.size()); // 6 is for modification digit
                                                                    // (15.995)
     for (int i = 0; i < modSiteArray.size(); i++){
       int modSite;
-      if (Integer.parseInt(modSiteArray.get(i)) == 1){ //N-term
-        modSite = -100; //LuciPHOr N-term
-      }
-      else if (Integer.parseInt(modSiteArray.get(i)) == peptideSequence.length() - 1){ //C-term
-        modSite = 100;  //LuciPHOr C-term
-      }
-      else{
-        modSite = Integer.parseInt(modSiteArray.get(i)) - 1;
-      }
+      modSite = Integer.parseInt(modSiteArray.get(i)) - 1;
       
-      sb.append(modSite);
-      sb.append("=");
-      sb.append(modMassArray.get(i));
+      sb.append(modSite).append("=").append(modMassArray.get(i));
       
       if (modSiteArray.size() > 1){
         if (i < modSiteArray.size() - 1){
@@ -188,7 +178,6 @@ public class ToLuciphor {
         }
       }
     }
-//    System.out.println(sb);
     return sb.toString();
   }
     
