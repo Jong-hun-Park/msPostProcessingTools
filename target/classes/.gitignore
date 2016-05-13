@@ -1,2 +1,13 @@
-/META-INF/
-/changeformat/
+/format/
+
+# Compiled source #
+
+*.com
+*.class
+*.dll
+
+# Logs and datbases #
+*.log
+*.fasta
+*.tsv
+
