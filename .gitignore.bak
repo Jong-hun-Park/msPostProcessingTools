@@ -10,4 +10,9 @@
 *.log
 *.fasta
 *.tsv
+*.txt
 
+#
+.gitignore
+.project
+.classpath
