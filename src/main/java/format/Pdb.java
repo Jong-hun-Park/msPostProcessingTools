@@ -20,7 +20,9 @@ public class Pdb {
   static final String HEADER_DELIMITER = ";";
   
   public static void main (String[] args){
-    String pdbFileName = "./repo/compositeDB/CompositeDB_145N+202T_v1.41.revCat.fasta";
+    String pdbFileName = "./repo/compositeDB/new_30sample_DB/"
+                       + "CompositeDB_5381N+5760T_v1.43"
+                       + ".fasta";
 
     try {
       convertPdbHeader(pdbFileName);
@@ -35,9 +37,11 @@ public class Pdb {
    * personalized database (PDB) is a composite DB of four different DB:
    * Expressed DB, Variant DB, Fusion Gene DB, and Contaminants.
    * 
+   * @param pdb file name
+   * @throw IOException 
    */
   public static void convertPdbHeader (String pdbFileName) throws IOException {
-    String outputFileName = pdbFileName.substring(0, pdbFileName.lastIndexOf(".")) + ".typeDivided_TEST.tsv";
+    String outputFileName = pdbFileName.substring(0, pdbFileName.lastIndexOf(".")) + ".typeDivided.fasta";
     
     // Load File
     BufferedReader pdbFile = new BufferedReader(new FileReader(pdbFileName));
@@ -54,7 +58,6 @@ public class Pdb {
         String convertedHeader = "";
         
         if (line.contains("Contaminant")){
-          
           // Both Contam and Uniprot matching case.
           if(line.contains(HEADER_DELIMITER)){
             String[] contamSplited = line.split(HEADER_DELIMITER);
@@ -70,13 +73,15 @@ public class Pdb {
             convertedHeader = divideBothType(contamSplited[1]);
             
             sb.append(convertedHeader);
+            outputFile.write(sb.toString() + "\n");
+            continue;
           }
-          outputFile.write(sb.toString() + "\n");
-          continue;
+          else{ //only contaminant case.
+            outputFile.write(line + "\n");
+            continue;
+          }
         }
         
-        //>ENST00000002165$SNV_M50V(chr6#143823157,0,T,C)*Germ*B43+B61&SNV_H65Y(chr6#143823112,0,G,A)*Germ*B43+B61
-        //this case!!
         if (hasMoreThanTwoHeader(pdbHeader)) {
           String[] headers = pdbHeader.split(HEADER_DELIMITER);
           
@@ -87,7 +92,7 @@ public class Pdb {
               convertedHeader = divideBothType(headers[i]);
             }
             
-            if (i == headers.length) { // the last header
+            if (i == (headers.length - 1)) { // the last header
               sb.append(convertedHeader).append("\n");
             } else {
               sb.append(convertedHeader).append(";");
@@ -116,36 +121,53 @@ public class Pdb {
     System.out.println("done");
   }
   
-  // Example
-  // >XXX_ENST00000559605$SNV_S42F(chr15#101910550,0,G,A)*Germ*B43+B61&CodeN_g
+  /*
+   * Possible cases for a header
+   * 
+   * case 1) header has just only one variant case
+   * >ENST00000013222$SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61 (okay)
+   * 
+   * case 2) header has one variant and *Code
+   * >ENST00000013222$SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61&CodeN_xx (okay)
+   * 
+   * case 3) header has other mutation
+   * >ENST00000013222$SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61&SNV_F54C(chr7#30795436,0,T,G)*Germ*B43+B61
+   * 
+   * case 4) header has other mutation and &CodeN_xx
+   * >ENST00000013222$SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61&SNV_F54C(chr7#30795436,0,T,G)*Germ*B43+B61&CodeN_xx
+   * 
+   * 
+   * @param header 
+   */
   private static String divideBothType(String header) {
     assert header.startsWith(PREFIX_OF_HEADER) == false : "should start with >";
-    
-    System.out.println(header);
-    /*
-     * other mutation case!
-     * >ENST00000013222$SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61&SNV_F54C(chr7#30795436,0,T,G)*Germ*B43+B61
-     * >ENST00000013222$SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61 (okay)
-     * >ENST00000013222$SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61&CODE (okay)
-     * 
-     * not implemented about this case
-     * >ENST00000013222$SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61&SNV_F54C(chr7#30795436,0,T,G)*Germ*B43+B61
-     * 
-     */
     
     StringBuilder sb = new StringBuilder(header.length() * 4);
     
     if (hasOtherMutation(header)) {
+            
       String[] separatedHeader = header.split("\\$");
       
       sb.append(separatedHeader[0])
         .append("$");                 //>ENST00000013222$
       
       if (hasAmbiguityCode(header)) {
-        // SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61&SNV_F54C(chr7#30795436,0,T,G)*Germ*B43+B61
+        // SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61&SNV_F54C(chr7#30795436,0,T,G)*Germ*B43+B61&CodeN_xx
         // now separted like this.
         // SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61
         // SNV_F54C(chr7#30795436,0,T,G)*Germ*B43+B61
+        // CodeN_xx
+        
+        String[] splitedMutation = separatedHeader[1].split("&");
+        String[] splitedLastMutation = splitedMutation[splitedMutation.length - 2].split("\\*");
+        String lastMutationPair = splitedLastMutation[splitedLastMutation.length - 1];
+        String sampleNumber = lastMutationPair.substring(1, splitedLastMutation[splitedLastMutation.length - 1].length());
+        
+        if (lastMutationPair.substring(0).startsWith("T")
+            && !sampleNumber.contains("+")) {
+          sampleNumber = String.valueOf(Integer.parseInt(sampleNumber) - 1 );
+        }
+        
         String[] variantMods = header.substring(header.indexOf("$") + 1, header.length())
                                      .split("&");
         
@@ -156,17 +178,34 @@ public class Pdb {
           String[] sepHeader = variantMods[i].split("\\*");
           String[] tsPairs = sepHeader[sepHeader.length - 1].split("\\+");
           
-          
           /*
            * *******************************************************
-           * EXCEPTIONAL CASE
+           * EXCEPTIONAL CASE (SHOULD BE DELEATED LATER)
            */
-          if (tsPairs[0].equals("B")){
+          if (tsPairs[0].equals("B") ||
+              tsPairs[0].equals("T") ||
+              tsPairs[0].equals("N")
+              ){
             //append to header except last type sample pairs 
             for (int j = 0 ; j < sepHeader.length - 1; j++){
               sb.append(sepHeader[j] + "*");
             }
-            exceptionFlag = true;
+            
+            if (tsPairs[0].equals("B")){
+              tsPairs[0] = tsPairs[0] + sampleNumber; // B43
+            }
+            else if(tsPairs[0].equals("T")){
+              tsPairs[0] = tsPairs[0] + (Integer.parseInt(sampleNumber) + 1); //T44
+            }
+            else {
+              tsPairs[0] = tsPairs[0] + sampleNumber; // N43
+            }
+                        
+            sb.append(convertPair(tsPairs))
+              .append("&");
+              
+            
+//            exceptionFlag = true;
             continue;
           }
           
@@ -207,8 +246,22 @@ public class Pdb {
       }
       else { //no ambiguity code case.
         
+        String[] splitedMutation = separatedHeader[1].split("&");
+        String[] splitedLastMutation = splitedMutation[splitedMutation.length - 1].split("\\*");
+        String lastMutationPair = splitedLastMutation[splitedLastMutation.length - 1];
+        
+        String sampleNumber = lastMutationPair.substring(1, splitedLastMutation[splitedLastMutation.length - 1].length());;
+        
+        System.out.println(sampleNumber);
+        if (lastMutationPair.substring(0).startsWith("T")
+            && !sampleNumber.contains("+")) {
+          sampleNumber = String.valueOf(Integer.parseInt(sampleNumber) - 1 );
+        }
+        
+        // an example header we have had is like
         // SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61&SNV_F54C(chr7#30795436,0,T,G)*Germ*B43+B61
-        // now separted like this.
+        
+        // now the header has changed like this.
         // SNV_E19G(chr7#30795331,0,A,G)*Germ*B43+B61
         // SNV_F54C(chr7#30795436,0,T,G)*Germ*B43+B61
         String[] variantMods = header.substring(header.indexOf("$") + 1, header.length())
@@ -221,15 +274,31 @@ public class Pdb {
           
           /*
            * *******************************************************
-           * EXCEPTIONAL CASE
+           * EXCEPTIONAL CASE (SHOULD BE DELEATED LATER)
            */
-          if (tsPairs[0].equals("B")){
+          if (tsPairs[0].equals("B") ||
+              tsPairs[0].equals("T") ||
+              tsPairs[0].equals("N")
+              ){
             //append to header except last type sample pairs 
             for (int j = 0 ; j < sepHeader.length - 1; j++){
               sb.append(sepHeader[j] + "*");
             }
-            exceptionFlag = true;
             
+            if (tsPairs[0].equals("B")){
+              tsPairs[0] = tsPairs[0] + sampleNumber; // B43
+            }
+            else if(tsPairs[0].equals("T")){
+              tsPairs[0] = tsPairs[0] + (Integer.parseInt(sampleNumber) + 1); //T44
+            }
+            else {
+              tsPairs[0] = tsPairs[0] + sampleNumber; // N43
+            }
+            
+            sb.append(convertPair(tsPairs))
+            .append("&");
+            
+//            exceptionFlag = true;
             continue;
           }
           
@@ -272,7 +341,7 @@ public class Pdb {
         
       }//else
       return sb.toString();
-    }
+    } //has other mutations.
     
     String convertedHeader = "";
     String[] splitedHeader = header.split("\\*");
@@ -291,6 +360,8 @@ public class Pdb {
       typeSamplePair = splitedHeader[splitedHeader.length - 1].split("&")[0];
       codeInfo = splitedHeader[splitedHeader.length - 1].split("&")[1];
       typeSamplePairs = typeSamplePair.split("\\+");
+      
+      System.out.println(header);
       
       convertedHeader = sb.append(convertPair(typeSamplePairs))
                           .append("&")

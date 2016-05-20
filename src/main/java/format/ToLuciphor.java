@@ -19,13 +19,13 @@ import java.util.List;
  */
 
 public class ToLuciphor {
-  private static final boolean isMODplusFormat = true;
-  
-  static String RESULT_FILE_DELIMITER = "\t";
+  static final boolean isMODplusFormat = true;
+  static final String RESULT_FILE_DELIMITER = "\t";
   
   public static void main(String[] args) {
-    String resultFileName = "1st_2nd_MSGF.txt";
-
+    String resultFileName = "TMT_3rd_MODPLUS_MERGE_TITLE.txt";
+    System.out.println("resultFile: " + resultFileName);
+    
     try {
       changeFormatForLuciphor(resultFileName);
     } catch (FileNotFoundException e) {
@@ -33,6 +33,8 @@ public class ToLuciphor {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
+    System.out.println("done");
   }
 
   /*
@@ -87,8 +89,10 @@ public class ToLuciphor {
       psmColumn = psmLine.trim().split(RESULT_FILE_DELIMITER);
       
       
-      spectrumFile     = psmColumn[0];
-//      spectrumFile     = psmColumn[0].split("/")[1];
+      String[] splitedSpectrumFile = psmColumn[0].split("/"); // in case of psmColumn has a file
+                                                              // path not just a file name
+      spectrumFile = splitedSpectrumFile[splitedSpectrumFile.length - 1]; // last index should be
+                                                                          // the file name
       index            = Integer.parseInt(psmColumn[1]);
       observedMW       = Float.parseFloat(psmColumn[2]);
       charge           = Integer.parseInt(psmColumn[3]);
