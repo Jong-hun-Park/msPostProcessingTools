@@ -158,7 +158,7 @@ public class ToLuciphor {
     String modSiteString = modification.replaceAll("[^0-9]+", " ");
     List<String> modSiteArray = Arrays.asList(modSiteString.trim().split(" "));
         
-    String modMassString = peptideSequence.replaceAll("[^0-9\\.]+", " ");
+    String modMassString = peptideSequence.replaceAll("[^0-9\\.\\-\\+]+", " ");
     List<String> modMassArray = Arrays.asList(modMassString.trim().split(" "));
     
     assert modSiteArray.size() == modMassArray.size() : "should be the same modification size";
