@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ToLuciphor {
   static final String RESULT_FILE_DELIMITER = "\t";
   
   public static void main(String[] args) {
-    String resultFileName = "TMT_3rd_MODPLUS_MERGE_TITLE_phosphoOnly.txt";
+    String resultFileName = "TMT_3rd_MODPLUS_MERGE_TITLE_hasPhospho_rmvSameResidueDiffMods_rmvNtermMod.txt";
     System.out.println("resultFile: " + resultFileName);
     
     try {
@@ -157,6 +158,12 @@ public class ToLuciphor {
     }
     String[] mods = modification.split(" "); 
     
+    ArrayList<String> modNameArray = new ArrayList<String>();
+    for (String mod : mods){
+      String modName = mod.split("\\(")[0];
+      modNameArray.add(modName);
+    }
+    
     String modSiteString = modification.replaceAll("[^0-9]+", " ");
     List<String> modSiteArray = Arrays.asList(modSiteString.trim().split(" "));
         
@@ -164,6 +171,7 @@ public class ToLuciphor {
     List<String> modMassArray = Arrays.asList(modMassString.trim().split(" "));
     
     assert modSiteArray.size() == modMassArray.size() : "should be the same modification size";
+    assert modSiteArray.size() == modNameArray.size() : "should be the same modification size";
     /*
      * LuciPHOr requires comma-delimited. The first residue in a peptide is position 0 and the rest
      * increment from there. For N-terminal or C-terminal modifications use -100 or 100 respectively
@@ -176,6 +184,11 @@ public class ToLuciphor {
                                                                    // (15.995)
     for (int i = 0; i < modSiteArray.size(); i++){
       int modSite;
+      
+      if (modNameArray.get(i).equals("De-TMT")){
+        continue;
+      }
+      
       
       if (mods[i].contains("Nterm")) {
         modSite = -100;

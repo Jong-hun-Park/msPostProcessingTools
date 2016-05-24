@@ -194,7 +194,7 @@ public class LuciphorToModplus {
                          + result.calculatedMW  + "\t"
                          + result.deltaMass  + "\t"
                          + result.score  + "\t"
-                         + result.probability  + "\t"
+                         + result.probability  + "\t"          
                          + result.peptideSequence  + "\t"
                          + result.protein  + "\t"
                          + result.modification  + "\t"
