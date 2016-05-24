@@ -23,7 +23,7 @@ public class ToLuciphor {
   static final String RESULT_FILE_DELIMITER = "\t";
   
   public static void main(String[] args) {
-    String resultFileName = "TMT_3rd_MODPLUS_MERGE_TITLE.txt";
+    String resultFileName = "TMT_3rd_MODPLUS_MERGE_TITLE_phosphoOnly.txt";
     System.out.println("resultFile: " + resultFileName);
     
     try {
@@ -155,6 +155,8 @@ public class ToLuciphor {
     if (isMODplusFormat) {
       peptideSequence = peptideSequence.substring(2, peptideSequence.length() -2); //K. SEQUENCE . R
     }
+    String[] mods = modification.split(" "); 
+    
     String modSiteString = modification.replaceAll("[^0-9]+", " ");
     List<String> modSiteArray = Arrays.asList(modSiteString.trim().split(" "));
         
@@ -174,7 +176,13 @@ public class ToLuciphor {
                                                                    // (15.995)
     for (int i = 0; i < modSiteArray.size(); i++){
       int modSite;
-      modSite = Integer.parseInt(modSiteArray.get(i)) - 1;
+      
+      if (mods[i].contains("Nterm")) {
+        modSite = -100;
+      }
+      else{
+        modSite = Integer.parseInt(modSiteArray.get(i)) - 1;
+      }
       
       sb.append(modSite).append("=").append(modMassArray.get(i));
       

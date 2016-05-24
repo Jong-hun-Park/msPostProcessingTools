@@ -25,8 +25,8 @@ public class LuciphorToModplus {
   
   public static void main(String[] args) {
 
-    String luciphorResultFile = "./repo/LuciphorToModplus/luciphor_results.luciphor2_input_template_MSGF_Union.tsv";
-    String modoplusResultFile = "./repo/LuciphorToModplus/1st_2nd_MSGF_MERGE.txt";
+    String luciphorResultFile = "./repo/LuciphorToModplus/msgf/luciphor_results.20165월22-12_48_39_MSGF.tsv";
+    String modoplusResultFile = "./repo/LuciphorToModplus/msgf/1st_2nd_MSGF_MERGE.txt";
 
     try {
       assignLuciphorToModplus(luciphorResultFile, modoplusResultFile);
@@ -66,21 +66,23 @@ public class LuciphorToModplus {
     
     // Load ModPlus result File
     String line = modplusReader.readLine(); // Read header
-    modplusWriter.write(line + "\n");              // Write header
+    String deltaScoreAddedHeader = line + "\t" + "DeltaScore"; // new result column for luciphor delta score.
+    modplusWriter.write(line + "\n");       // Write header
     
     // Modplus result file columns
     String spectrumFile     = "";
-    int index               = -1;
-    float observedMW        = -1;
-    int charge              = -1;
-    float calculatedMW      = -1;
-    float deltaMass         = -1;
-    int score               = -1;
-    double probability      = -1;
+    String index            = "";
+    String observedMW       = "";
+    String charge           = "";
+    String calculatedMW     = "";
+    String deltaMass        = "";
+    String score            = "";
+    String probability      = "";
     String peptideSequence  = "";
     String protein          = "";
     String modification     = "";
     String scanNum          = "";
+    String deltaScore       = ""; //luciphor delta score.
     
     ArrayList<String> modplusFileNameList = new ArrayList<String>(); // to keep order
     HashMap<String, ModPlusResult> modplusResultHM = new HashMap<String, ModPlusResult>();
@@ -91,17 +93,20 @@ public class LuciphorToModplus {
       assert (splitedResult.length == 12): "mod plus reulst format has 12 columns";
       
       spectrumFile     = splitedResult[0];
-      index            = Integer.parseInt(splitedResult[1]);
-      observedMW       = Float.parseFloat(splitedResult[2]);
-      charge           = Integer.parseInt(splitedResult[3]);
-      calculatedMW     = Float.parseFloat(splitedResult[4]);
-      deltaMass        = Float.parseFloat(splitedResult[5]);
-      score            = Integer.parseInt(splitedResult[6]);
-      probability      = Double.parseDouble(splitedResult[7]);
+      index            = splitedResult[1];
+      observedMW       = splitedResult[2];
+      charge           = splitedResult[3];
+      calculatedMW     = splitedResult[4];
+      deltaMass        = splitedResult[5];
+      score            = splitedResult[6];
+      probability      = splitedResult[7];
       peptideSequence  = splitedResult[8];
       protein          = splitedResult[9];
       modification     = splitedResult[10];
-      scanNum          = splitedResult[11];
+      scanNum          = splitedResult[11]; //msgf
+//      scanNum          = splitedResult[11].split("=")[1]; //modplus
+      deltaScore       = "";
+      
       
       ModPlusResult modReulstRow = new ModPlusResult( spectrumFile, 
                                                       index, 
@@ -114,7 +119,8 @@ public class LuciphorToModplus {
                                                       peptideSequence,
                                                       protein,
                                                       modification,
-                                                      scanNum);
+                                                      scanNum,
+                                                      deltaScore);
                                                             
       modplusFileNameList.add(scanNum); // to keep order
       modplusResultHM.put(scanNum, modReulstRow); //to find result
@@ -163,11 +169,8 @@ public class LuciphorToModplus {
             sameSiteCount ++;
           }
         }
-        
-        if (sameSiteCount == modplusPhosphoSite.size()){ //all site is the same, no change
-          continue;
-        }
-        else{ // at least one site is changed, so change phospho site
+        // at least one site is changed, so change phospho site
+        if (sameSiteCount != modplusPhosphoSite.size()){ 
           modpResult = ModPlusResult.changePhosphoSite(modpResult, luciphorPhosphoSite);
           modplusResultHM.put(specId, modpResult);
           siteChangedCount++;
@@ -195,7 +198,8 @@ public class LuciphorToModplus {
                          + result.peptideSequence  + "\t"
                          + result.protein  + "\t"
                          + result.modification  + "\t"
-                         + result.scanNum  + "\n"
+                         + result.scanNum  + "\t"
+                         + result.deltaScore + "\n"
                          );
     }
     
@@ -210,9 +214,11 @@ public class LuciphorToModplus {
 
   private static ArrayList<Integer> getPhosphoSite(String luciphorPepSeq) {
     ArrayList<Integer> result = new ArrayList<Integer>();
-    
+    //phospho count. 
     for (int i = 0; i < luciphorPepSeq.length(); i++){
-      if (Character.isLowerCase(luciphorPepSeq.charAt(i))){
+      if (  (luciphorPepSeq.charAt(i) == 's')
+          ||(luciphorPepSeq.charAt(i) == 't')
+          ||(luciphorPepSeq.charAt(i) == 'y') ){
         result.add(i + 1); // zero base (luciphor) to one base (modplus)
       }
     }

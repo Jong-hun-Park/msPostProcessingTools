@@ -1,28 +1,31 @@
 package result;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 // TODO: make a abstract class result file scan data
 
 public class ModPlusResult {
   public String spectrumFile;
-  public int index;
-  public float observedMW;
-  public int charge;
-  public float calculatedMW;
-  public float deltaMass;
-  public int score;
-  public double probability;
+  public String index;
+  public String observedMW;
+  public String charge;
+  public String calculatedMW;
+  public String deltaMass;
+  public String score;
+  public String probability;
   public String peptideSequence;
   public String protein;
   public String modification;
   public String scanNum;
+  public String deltaScore; //luciphor deltaScore
   
   public static String phosphoMass = "+79.966";
 
-  public ModPlusResult(String spectrumFile, int index, float observedMW, int charge,
-      float calculatedMW, float deltaMass, int score, double probability, String peptideSequence,
-      String protein, String modification, String scanNum) {
+  public ModPlusResult(String spectrumFile, String index, String observedMW, String charge,
+      String calculatedMW, String deltaMass, String score, String probability, String peptideSequence,
+      String protein, String modification, String scanNum, String deltaScore) {
     this.spectrumFile = spectrumFile;
     this.index = index;
     this.observedMW = observedMW;
@@ -35,6 +38,7 @@ public class ModPlusResult {
     this.protein = protein;
     this.modification = modification;
     this.scanNum = scanNum;
+    this.deltaScore = deltaScore;
   }
 
 
@@ -109,6 +113,8 @@ public class ModPlusResult {
     
     String[] mods = result.modification.split(" "); // modification column delimeter.
     ArrayList<String> changedMods = new ArrayList<String>();
+    ArrayList<Integer> siteOfChangedMod = new ArrayList<Integer>(); // sorting chagedMods 
+                                                                         // using phospho site with increasing order.
     
     String modName = "";
     String modSite = "";
@@ -132,12 +138,31 @@ public class ModPlusResult {
                         + modSite
                         + ")";
       
+      siteOfChangedMod.add(Integer.parseInt(modSite));
       changedMods.add(changedMod);
+      
+    }
+    
+    for (int a : siteOfChangedMod){
+      System.out.println(a);
+    }
+    Collections.sort(siteOfChangedMod);
+    
+    for (int a : siteOfChangedMod){
+      System.out.println(a);
     }
     
     String changedModiciationCol = "";
-    for(String m : changedMods){
-      changedModiciationCol += (m + " ");
+    for (int site : siteOfChangedMod){
+      for(String m : changedMods){
+        String[] splited = m.split("\\(");
+        modSite = splited[1].substring(1, splited[1].length() - 1);
+        int index = Integer.parseInt(modSite);
+        
+        if (site == index){
+          changedModiciationCol += (m + " ");
+        }
+      }
     }
     
     result.modification = changedModiciationCol;
