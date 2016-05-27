@@ -25,8 +25,8 @@ public class LuciphorToModplus {
   
   public static void main(String[] args) {
 
-    String luciphorResultFile = "./repo/LuciphorToModplus/msgf/luciphor_results.20165월22-12_48_39_MSGF.tsv";
-    String modoplusResultFile = "./repo/LuciphorToModplus/msgf/1st_2nd_MSGF_MERGE.txt";
+    String luciphorResultFile = "./repo/LuciphorToModplus/modplus/luciphor_results_1stSelected_0524.tsv";
+    String modoplusResultFile = "./repo/LuciphorToModplus/modplus/TMT_3rd_MODPLUS_MERGE_TITLE.txt";
 
     try {
       assignLuciphorToModplus(luciphorResultFile, modoplusResultFile);
@@ -67,7 +67,7 @@ public class LuciphorToModplus {
     // Load ModPlus result File
     String line = modplusReader.readLine(); // Read header
     String deltaScoreAddedHeader = line + "\t" + "DeltaScore"; // new result column for luciphor delta score.
-    modplusWriter.write(line + "\n");       // Write header
+    modplusWriter.write(deltaScoreAddedHeader + "\n");       // Write header
     
     // Modplus result file columns
     String spectrumFile     = "";
@@ -103,8 +103,8 @@ public class LuciphorToModplus {
       peptideSequence  = splitedResult[8];
       protein          = splitedResult[9];
       modification     = splitedResult[10];
-      scanNum          = splitedResult[11]; //msgf
-//      scanNum          = splitedResult[11].split("=")[1]; //modplus
+//      scanNum          = splitedResult[11]; //msgf
+      scanNum          = splitedResult[11].split("=")[1]; //modplus
       deltaScore       = "";
       
       
@@ -136,6 +136,7 @@ public class LuciphorToModplus {
     // luciphor result columns
     String specId = "";
     String predictedPep1 = "";
+    String luciphorDeltaScore = "";
     
     line = luciphorReader.readLine(); //header
     
@@ -149,6 +150,8 @@ public class LuciphorToModplus {
       
       specId = splitedResult[0];
       predictedPep1 = splitedResult[2];
+      luciphorDeltaScore = splitedResult[7];
+      
       
       // modplus scanNum is equal to luciphor result specId column
       if (modplusResultHM.containsKey(specId)){
@@ -172,10 +175,10 @@ public class LuciphorToModplus {
         // at least one site is changed, so change phospho site
         if (sameSiteCount != modplusPhosphoSite.size()){ 
           modpResult = ModPlusResult.changePhosphoSite(modpResult, luciphorPhosphoSite);
-          modplusResultHM.put(specId, modpResult);
           siteChangedCount++;
         }
-          
+        modpResult.deltaScore = luciphorDeltaScore;
+        modplusResultHM.put(specId, modpResult);
       }
       else{
         System.err.println("there is a not matched luciphor result");

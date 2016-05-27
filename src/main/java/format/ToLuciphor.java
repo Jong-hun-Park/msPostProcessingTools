@@ -24,7 +24,7 @@ public class ToLuciphor {
   static final String RESULT_FILE_DELIMITER = "\t";
   
   public static void main(String[] args) {
-    String resultFileName = "TMT_3rd_MODPLUS_MERGE_TITLE_hasPhospho_rmvSameResidueDiffMods_rmvNtermMod.txt";
+    String resultFileName = "TMT_3rd_MODPLUS_MERGE_TITLE_hasPhospho_rmvSameResidueDiffMods_rmvNtermMod_rmvStyMod_hasSpecificMods.txt";
     System.out.println("resultFile: " + resultFileName);
     
     try {
