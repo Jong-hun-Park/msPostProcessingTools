@@ -24,7 +24,7 @@ public class ToLuciphor {
   static final String RESULT_FILE_DELIMITER = "\t";
   
   public static void main(String[] args) {
-    String resultFileName = "TMT_3rd_MODPLUS_MERGE_TITLE_hasPhospho_rmvSameResidueDiffMods_rmvNtermMod_rmvStyMod_hasSpecificMods.txt";
+    String resultFileName = "3rd_modplus_1stSelected.txt";
     System.out.println("resultFile: " + resultFileName);
     
     try {
@@ -182,14 +182,12 @@ public class ToLuciphor {
      */
     StringBuilder sb = new StringBuilder(6 * modSiteArray.size()); // 6 is for modification digit
                                                                    // (15.995)
-    for (int i = 0; i < modSiteArray.size(); i++){
+    for (int i = 0; i < modSiteArray.size(); i++) {
       int modSite;
       
-      if (modNameArray.get(i).equals("De-TMT")){
+      if (modNameArray.get(i).equals("De-TMT")) { 
         continue;
       }
-      
-      
       if (mods[i].contains("Nterm")) {
         modSite = -100;
       }
@@ -199,8 +197,8 @@ public class ToLuciphor {
       
       sb.append(modSite).append("=").append(modMassArray.get(i));
       
-      if (modSiteArray.size() > 1){
-        if (i < modSiteArray.size() - 1){
+      if (modSiteArray.size() > 1) {
+        if (i < modSiteArray.size() - 1) {
           sb.append(",");
         }
       }

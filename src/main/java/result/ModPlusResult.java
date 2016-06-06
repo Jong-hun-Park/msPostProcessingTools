@@ -124,10 +124,10 @@ public class ModPlusResult {
     for (String mod : mods){
       String[] splited = mod.split("\\(");
       
-      modName = splited[0];
-      modSite = splited[1].substring(1, splited[1].length() - 1); // check
+      modName = splited[0]; // e.g.) "Phospho"
+      modSite = splited[1].substring(1, splited[1].length() - 1); // e.g.) S, T, Y
       
-      if (modName.equals("Phospho")){ //change it
+      if (modName.equals("Phospho")){ // get the modSite from luciphor result cuz it can be changed.
         modSite = luciphorPhosphoSite.get(luciphorIndex).toString();
         luciphorIndex++;
       }
@@ -143,17 +143,25 @@ public class ModPlusResult {
       
     }
     
-    for (int a : siteOfChangedMod){
-      System.out.println(a);
-    }
+    /**
+     * To sort the changedMod by it's modSite,
+     * sort the site of site of changed mod and write output by the order
+     */
     Collections.sort(siteOfChangedMod);
     
-    for (int a : siteOfChangedMod){
-      System.out.println(a);
-    }
-    
     String changedModiciationCol = "";
+    /*
+     * there is a bug. (if N-term modification and first residue modification
+     * occurs simultaneously, it doesn't work)
+     */
+    boolean hasNtermMod = false;
     for (int site : siteOfChangedMod){
+      if (hasNtermMod && site == 1) {
+        continue;
+      }
+      if (site == 1) { // N-Term
+        hasNtermMod = true;
+      }
       for(String m : changedMods){
         String[] splited = m.split("\\(");
         modSite = splited[1].substring(1, splited[1].length() - 1);

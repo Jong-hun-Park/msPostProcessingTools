@@ -25,8 +25,8 @@ public class LuciphorToModplus {
   
   public static void main(String[] args) {
 
-    String luciphorResultFile = "./repo/LuciphorToModplus/modplus/luciphor_results_1stSelected_0524.tsv";
-    String modoplusResultFile = "./repo/LuciphorToModplus/modplus/TMT_3rd_MODPLUS_MERGE_TITLE.txt";
+    String luciphorResultFile = "./repo/LuciphorToModplus/modplus/GBM0606_1set/luciphor_results_modplus_20160606.tsv";
+    String modoplusResultFile = "./repo/LuciphorToModplus/modplus/GBM0606_1set/3rd_MODplus_TMT_TITLE.txt";
 
     try {
       assignLuciphorToModplus(luciphorResultFile, modoplusResultFile);
