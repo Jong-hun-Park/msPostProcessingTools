@@ -24,7 +24,7 @@ public class ToLuciphor {
   static final String RESULT_FILE_DELIMITER = "\t";
   
   public static void main(String[] args) {
-    String resultFileName = "3rd_modplus_1stSelected.txt";
+    String resultFileName = "3rd_TMT_MODplus_2set_1stSelected.txt";
     System.out.println("resultFile: " + resultFileName);
     
     try {
@@ -51,7 +51,7 @@ public class ToLuciphor {
    * @param resultFileName
    */
   private static void changeFormatForLuciphor(String resultFileName) throws IOException {
-    String outputFileName = resultFileName.substring(0, resultFileName.lastIndexOf(".")) + ".Luciphor_formated.tsv";
+    String outputFileName = resultFileName.substring(0, resultFileName.lastIndexOf(".")) + "_Luciphor_formated.tsv";
     
     // Load File
     BufferedReader resultFile = new BufferedReader(new FileReader(resultFileName));
