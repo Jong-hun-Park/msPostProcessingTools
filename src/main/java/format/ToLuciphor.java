@@ -24,7 +24,7 @@ public class ToLuciphor {
   static final String RESULT_FILE_DELIMITER = "\t";
   
   public static void main(String[] args) {
-    String resultFileName = "3rd_TMT_MODplus_2set_1stSelected.txt";
+    String resultFileName = "[set5]TMT_3rd_modplus_1stSelected.txt";
     System.out.println("resultFile: " + resultFileName);
     
     try {
@@ -109,6 +109,7 @@ public class ToLuciphor {
       stipPeptideSeq = getStripPeptideSeq(peptideSequence);
       modSite = getModSite(peptideSequence, modification);
       
+      // When scanNum is written like the TITLE = .xxx.xxx.
       String[] splitedScanNum = scanNum.split("\\.");
       scanNum = splitedScanNum[1];
       
@@ -172,6 +173,7 @@ public class ToLuciphor {
     
     assert modSiteArray.size() == modMassArray.size() : "should be the same modification size";
     assert modSiteArray.size() == modNameArray.size() : "should be the same modification size";
+    
     /*
      * LuciPHOr requires comma-delimited. The first residue in a peptide is position 0 and the rest
      * increment from there. For N-terminal or C-terminal modifications use -100 or 100 respectively

@@ -20,12 +20,13 @@ public class ModPlusResult {
   public String modification;
   public String scanNum;
   public String deltaScore; //luciphor deltaScore
+  public String title;
   
   public static String phosphoMass = "+79.966";
 
   public ModPlusResult(String spectrumFile, String index, String observedMW, String charge,
       String calculatedMW, String deltaMass, String score, String probability, String peptideSequence,
-      String protein, String modification, String scanNum, String deltaScore) {
+      String protein, String modification, String scanNum, String deltaScore, String title) {
     this.spectrumFile = spectrumFile;
     this.index = index;
     this.observedMW = observedMW;
@@ -39,6 +40,8 @@ public class ModPlusResult {
     this.modification = modification;
     this.scanNum = scanNum;
     this.deltaScore = deltaScore;
+    this.title = title;
+    
   }
 
 

@@ -25,8 +25,8 @@ public class LuciphorToModplus {
   
   public static void main(String[] args) {
 
-    String luciphorResultFile = "./repo/LuciphorToModplus/modplus/GBM0606_1set/luciphor_results_modplus_20160606.tsv";
-    String modoplusResultFile = "./repo/LuciphorToModplus/modplus/GBM0606_1set/3rd_MODplus_TMT_TITLE.txt";
+    String luciphorResultFile = "./repo/LuciphorToModplus/modplus/GBM0706_set4/[set4]luciphor_results_modplus_20160706.tsv";
+    String modoplusResultFile = "./repo/LuciphorToModplus/modplus/GBM0706_set4/[set4]TMT_3rd_MODplus_Merge_Title.txt";
 
     try {
       assignLuciphorToModplus(luciphorResultFile, modoplusResultFile);
@@ -83,6 +83,7 @@ public class LuciphorToModplus {
     String modification     = "";
     String scanNum          = "";
     String deltaScore       = ""; //luciphor delta score.
+    String title            = "";
     
     ArrayList<String> modplusFileNameList = new ArrayList<String>(); // to keep order
     HashMap<String, ModPlusResult> modplusResultHM = new HashMap<String, ModPlusResult>();
@@ -104,8 +105,11 @@ public class LuciphorToModplus {
       protein          = splitedResult[9];
       modification     = splitedResult[10];
 //      scanNum          = splitedResult[11]; //msgf
-      scanNum          = splitedResult[11].split("=")[1]; //modplus
-      deltaScore       = "";
+//      scanNum          = splitedResult[11].split("=")[1]; //modplus
+      scanNum          = splitedResult[11].split(" ")[0].split("=")[1]; //modplus merged
+      title            = splitedResult[11];
+      
+      deltaScore       = "-";
       
       
       ModPlusResult modReulstRow = new ModPlusResult( spectrumFile, 
@@ -120,12 +124,12 @@ public class LuciphorToModplus {
                                                       protein,
                                                       modification,
                                                       scanNum,
-                                                      deltaScore);
+                                                      deltaScore,
+                                                      title);
                                                             
       modplusFileNameList.add(scanNum); // to keep order
       modplusResultHM.put(scanNum, modReulstRow); //to find result
     }
-    
     
     /*
      * Load luciphor result file
@@ -182,6 +186,7 @@ public class LuciphorToModplus {
       }
       else{
         System.err.println("there is a not matched luciphor result");
+        System.err.println(specId);
         System.exit(-1);
       }
     } //luciphor loading and change phospho site.
@@ -201,7 +206,7 @@ public class LuciphorToModplus {
                          + result.peptideSequence  + "\t"
                          + result.protein  + "\t"
                          + result.modification  + "\t"
-                         + result.scanNum  + "\t"
+                         + result.title  + "\t"
                          + result.deltaScore + "\n"
                          );
     }
