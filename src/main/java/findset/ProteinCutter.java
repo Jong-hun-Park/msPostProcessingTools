@@ -21,7 +21,7 @@ public class ProteinCutter {
    *
    * @return a set of peptide sequences (considered the given constraints)
    */
-  public static ArrayList<String> findFullyTrypticPeptideSequences(String proteinSeq, int missCleavageSize, int minPeptideLength){
+  public ArrayList<String> findFullyTrypticPeptideSequences(String proteinSeq, int missCleavageSize, int minPeptideLength){
     
     ArrayList<String> peptideSequences = new ArrayList<String>();
     int missedCleavageCount = 0;
@@ -62,5 +62,36 @@ public class ProteinCutter {
     
     return peptideSequences;
   }
+  
+  public ArrayList<String> findFullyTrypticPeptideSequences_new(String proteinSeq, int missCleavageSize, int minPeptideLength){
+    ArrayList<String> fullyTrypticSequences = new ArrayList<String>();
+    ArrayList<Integer> trypticIndices = new ArrayList<Integer>();
+    char[] proteinSequence = proteinSeq.toCharArray();
+    
+    //Scan all tryptic indices to add their index.
+    trypticIndices.add(0); //Protein N-term
+    for (int i = 0; i < proteinSequence.length; i++) {
+      if (proteinSequence[i] == 'K' || proteinSequence[i] == 'R'){
+        trypticIndices.add(i + 1);
+      }
+    }
+    trypticIndices.add(proteinSequence.length); //Protein C-term
+    
+    String peptideSeq = "";
+    for (int begin = 0; begin < trypticIndices.size() - 1 - missCleavageSize; begin++) {
+      int end = begin + 1 + missCleavageSize; //begin + 1 means no missCleavage allowed
 
+      int beginIndex = trypticIndices.get(begin);
+      int endIndex = trypticIndices.get(end);
+        
+      peptideSeq = proteinSeq.substring(beginIndex, endIndex);
+      
+      if (peptideSeq.length() >= minPeptideLength) {
+        fullyTrypticSequences.add(peptideSeq);
+      }
+    }
+    
+    return fullyTrypticSequences;
+  }
 }
+  
