@@ -45,7 +45,7 @@ public class ProteinCutterTest {
     int minPeptideLength = 1;
     String proteinSeq  = "KRKRKR";
     
-    for (int i = 0; i <= missCleavageSize; i ++){
+    for (int i = 0; i <= missCleavageSize; i++){
       peptideSequenceSet.addAll(proCutter.findFullyTrypticPeptideSequences(proteinSeq, i, minPeptideLength));
       System.out.println(peptideSequenceSet);
     }
@@ -65,7 +65,7 @@ public class ProteinCutterTest {
     int minPeptideLength = 1;
     String proteinSeq  = "ARBRC";
     
-    for (int i = 0; i <= missCleavageSize; i ++){
+    for (int i = 0; i <= missCleavageSize; i++){
       peptideSequenceSet.addAll(proCutter.findFullyTrypticPeptideSequences(proteinSeq, i, minPeptideLength));
       System.out.println(peptideSequenceSet);
     }

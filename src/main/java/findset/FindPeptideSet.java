@@ -1,11 +1,13 @@
 package findset;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class FindPeptideSet {
@@ -13,7 +15,9 @@ public class FindPeptideSet {
   static int maxMissCleavage = 2;
   static int minPeptideLength = 8;
   
+  
   public static void main(String[] args) throws IOException {
+    BufferedWriter bw = new BufferedWriter(new FileWriter("possiblePeptides.txt"));
 
     String proteinSeq = "";
     int proteinCount = 0; //need to test.
@@ -63,11 +67,21 @@ public class FindPeptideSet {
         peptideSequenceSet.addAll(proCutter.findFullyTrypticPeptideSequences(proteinSeq, missCleavageSize, minPeptideLength));
       }
     }
+    
+    for (Iterator<String> iterator = peptideSequenceSet.iterator(); iterator.hasNext();) {
+      String peptide = iterator.next();
 
+      bw.write(peptide + "\n");
+      if ( (peptide.charAt(peptide.length() - 1 ) != 'K') && (peptide.charAt(peptide.length() - 1) != 'R') ) {
+        System.out.println(peptide);
+      }
+    }
+    
     System.out.println("peptide lists: ");
     System.out.println(peptideSequenceSet);
     System.out.println("the number of elements in the Peptide Sequence Set: " + peptideSequenceSet.size());
-
+    
+    bw.close();
   }
 
 }

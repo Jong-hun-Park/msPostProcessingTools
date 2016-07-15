@@ -29,21 +29,21 @@ public class ProteinCutter {
     char[] proteinSequence = proteinSeq.toCharArray();
     
     //Scan all tryptic indices to add their index.
-    trypticIndices.add(0); //Protein N-term
+    trypticIndices.add(-1); //Protein N-term
     for (int i = 0; i < proteinSequence.length; i++) {
       if (proteinSequence[i] == 'K' || proteinSequence[i] == 'R'){
-        trypticIndices.add(i + 1);
+        trypticIndices.add(i);
       }
     }
-    trypticIndices.add(proteinSequence.length); //Protein C-term
+    trypticIndices.add(proteinSequence.length - 1); //Protein C-term
     
     String peptideSeq = "";
     for (int begin = 0; begin < trypticIndices.size() - 1 - missCleavageSize; begin++) {
       int end = begin + 1 + missCleavageSize; //begin + 1 means no missCleavage allowed
 
-      int beginIndex = trypticIndices.get(begin);
-      int endIndex = trypticIndices.get(end);
-        
+      int beginIndex = trypticIndices.get(begin) + 1;
+      int endIndex = trypticIndices.get(end) + 1;
+      
       peptideSeq = proteinSeq.substring(beginIndex, endIndex);
       
       if (peptideSeq.length() >= minPeptideLength) {
