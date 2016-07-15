@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 // open file, and parse parameters.
 public class ArgumentsParser {
-
   String[] args;
 
   public ArgumentsParser(String[] args) {
