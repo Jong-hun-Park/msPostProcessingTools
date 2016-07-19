@@ -9,13 +9,11 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import postprocessing.SearchResult;
-
-public class SpikeIn implements SearchTool{
+public class SpikeIn extends SearchTool{
   private Map<String, SearchResult> fileAneResultMap = new HashMap<>();
 
   @Override
-  public void scanResultFile(String resultFileName) throws IOException {
+  public void loadResultFile(String resultFileName) throws IOException {
     BufferedReader resultFileReader = new BufferedReader(new FileReader(resultFileName));
 
     String resultLine = "";

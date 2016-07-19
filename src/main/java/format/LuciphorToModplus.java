@@ -25,8 +25,8 @@ public class LuciphorToModplus {
   
   public static void main(String[] args) {
 
-    String luciphorResultFile = "./repo/LuciphorToModplus/modplus/GBM0706_set4/[set4]luciphor_results_modplus_20160706.tsv";
-    String modoplusResultFile = "./repo/LuciphorToModplus/modplus/GBM0706_set4/[set4]TMT_3rd_MODplus_Merge_Title.txt";
+    String luciphorResultFile = "./repo/LuciphorToModplus/modplus/GBM0708_set6/[set6]luciphor_results_modplus_20160708.tsv";
+    String modoplusResultFile = "./repo/LuciphorToModplus/modplus/GBM0708_set6/[set6]3rd_MODplus_TMT_Title.txt";
 
     try {
       assignLuciphorToModplus(luciphorResultFile, modoplusResultFile);
@@ -104,9 +104,10 @@ public class LuciphorToModplus {
       peptideSequence  = splitedResult[8];
       protein          = splitedResult[9];
       modification     = splitedResult[10];
-//      scanNum          = splitedResult[11]; //msgf
+      scanNum          = splitedResult[11]; //msgf
 //      scanNum          = splitedResult[11].split("=")[1]; //modplus
-      scanNum          = splitedResult[11].split(" ")[0].split("=")[1]; //modplus merged
+//      scanNum          = splitedResult[11].split(" ")[0].split("=")[0]; //msgf merged
+//      scanNum          = splitedResult[11].split(" ")[0].split("=")[1]; //modplus merged
       title            = splitedResult[11];
       
       deltaScore       = "-";

@@ -24,7 +24,7 @@ public class ToLuciphor {
   static final String RESULT_FILE_DELIMITER = "\t";
   
   public static void main(String[] args) {
-    String resultFileName = "[set5]TMT_3rd_modplus_1stSelected.txt";
+    String resultFileName = "[set6]1st_2nd_MSGF_TMT_Title.txt";
     System.out.println("resultFile: " + resultFileName);
     
     try {

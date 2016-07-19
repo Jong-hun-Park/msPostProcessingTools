@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import parameter.ArgumentsParser;
+import parameter.Option;
+
 /*
  * Remove Identified Spectrum from the given spectrum file and Make an unidentified spectrum
  * file(.mgf format) Generalized version of the old version of MakeUnidentifiedSpectra. 
@@ -65,7 +68,7 @@ public class MakeUnidentifiedSpectra {
     }
     
     // 1. read result file and store the information
-    searchResult.scanResultFile(resultFileName);
+    searchResult.loadResultFile(resultFileName);
     // 2. read spectrum file and check if the spectrum is identified or not. if not, write the
     // spectrum to new out file (concatenated _IdRemoved.mgf)
     searchResult.writeUnidentifiedSpectrum(spectrumFileName);
