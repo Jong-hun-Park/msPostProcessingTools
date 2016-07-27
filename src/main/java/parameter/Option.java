@@ -5,8 +5,6 @@ package parameter;
  */
 public class Option {
 	
-	enum ResultFormat {spikein, MSGFplus, MODplus}
-	
 	public final String flag;
 	public final String paramValue;
 
