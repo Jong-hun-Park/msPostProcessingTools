@@ -22,7 +22,8 @@ import parameter.Option;
  * @author Jonghun Park
  **/
 
-public class MakeUnidentifiedSpectra {
+//TODO: change this class name, not a verb form, but a Noun form.
+public class IdRemover {
 
   public static void main(String[] args) throws IOException {
 
