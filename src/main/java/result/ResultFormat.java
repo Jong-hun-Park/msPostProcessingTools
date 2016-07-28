@@ -9,4 +9,8 @@ public enum ResultFormat {
     return this == SPIKEIN;
   }
   
+  public boolean isMsgf() {
+    return this == MSGF;
+  }
+  
 }

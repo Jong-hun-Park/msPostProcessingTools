@@ -1,59 +1,13 @@
 package result;
 
-public class SearchResult {
-	
-	private String fileName;
-	private int index;
-	private String title;
-	private String charge;
-	
-	public SearchResult (String fileName, int index){
-		this.fileName = fileName;
-		this.index = index;
-	}
-	public SearchResult (String fileName, int index, String title){
-		this.fileName = fileName;
-		this.index= index;
-		this.title = title;
-	}
-	public SearchResult (String fileName, int index, String title, String charge){
-		this.fileName = fileName;
-		this.index= index;
-		this.title = title;
-		this.charge = charge;
-	}
-	
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-	private void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+public interface SearchResult {
 
-	private void setIndex(int index) {
-		this.index = index;
-	}
+  public abstract void loadResultFile            (String resultFileName) throws IOException;
+  public abstract void writeUnidentifiedSpectrum (String spectrumFileName) throws IOException;
 
-	private void setTitle(String title) {
-		this.title = title;
-	}
-	
-	private void setCharge(String charge) {
-		this.charge = charge;
-	}
-
-	private String getFileName() {
-		return this.fileName;
-	}
-
-	private String getIndex() {
-		return this.fileName;
-	}
-
-	private String getTitle() {
-		return this.fileName;
-	}
-	
-	private String getCharge() {
-		return this.charge;
-	}
-
+  
 }

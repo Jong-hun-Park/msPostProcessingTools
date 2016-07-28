@@ -54,10 +54,6 @@ public class ArgumentsParser {
     this.optionList = optsList;
   }
 
-  public boolean hasInvalidOption() {
-    return (this.optionList == null);
-  }
-
   public void printErrorMessage() {
     System.out.println("Please check the arguments");
 

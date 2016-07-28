@@ -7,8 +7,6 @@ public class Arguments {
   private String spectrumFileName;
   private ResultFormat resultFormat;
   
-  
-  
   public Arguments(ArgumentsParser argsParser) {
     //TODO: format checker?
     //TODO: possible option list.

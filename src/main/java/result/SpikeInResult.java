@@ -9,8 +9,8 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SpikeIn extends SearchTool{
-  private Map<String, SearchResult> fileAneResultMap = new HashMap<>();
+public class SpikeInResult implements SearchResult{
+  private Map<String, Result> fileAneResultMap = new HashMap<>();
 
   @Override
   public void loadResultFile(String resultFileName) throws IOException {
@@ -29,7 +29,7 @@ public class SpikeIn extends SearchTool{
         String fileName = columns[0];
         int index = 0;
         String charge = "";
-        SearchResult searchResult;
+        Result searchResult;
 
         if (isInteger(columns[1])) {
           index = Integer.parseInt(columns[1]);
@@ -38,7 +38,7 @@ public class SpikeIn extends SearchTool{
           index = Integer.parseInt(columns[1].replaceAll("[\\D]", ""));
         }
 
-        searchResult = new SearchResult(fileName, index);
+        searchResult = new Result(fileName, index);
 
         /* A HACK, this is only for the case that (fileName = TITLE in the formated result) */
         fileAneResultMap.put(fileName, searchResult);
