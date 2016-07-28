@@ -9,26 +9,28 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SpikeInResult implements SearchResult{
-  private Map<String, PSM> fileAndPsmMap = new HashMap<>();
-
+public class MsgfPlusResult implements SearchResult{
+  private Map<String, PSM> titleAndPsmMap = new HashMap<>();
+  private static final String TSV_DELIMITER = "\t";
+  
   @Override
   public void loadResultFile(String resultFileName) throws IOException {
     BufferedReader resultFileReader = new BufferedReader(new FileReader(resultFileName));
 
     String resultLine = "";
-    // Read header
-    resultLine = resultFileReader.readLine();
-    // TODO: header checker
+    // Read header. #SpecFile
+    checkHeader(resultFileReader, resultLine);
 
     if (isTsv(resultFileName)) {
-
+      
       while ((resultLine = resultFileReader.readLine()) != null) {
-        String columns[] = resultLine.split("\t"); // because the reulst file is tsv file.
-        String fileName = columns[0];
+        String columns[] = resultLine.split(TSV_DELIMITER); // tsv format
+        
+        String specFile = columns[0];
         int index = 0;
-        String charge = "";
-        PSM searchResult;
+        String title = columns[3];
+        String charge = columns[8];
+        PSM psm;
 
         if (isInteger(columns[1])) {
           index = Integer.parseInt(columns[1]);
@@ -36,11 +38,9 @@ public class SpikeInResult implements SearchResult{
           /* get only integer from the given string. */
           index = Integer.parseInt(columns[1].replaceAll("[\\D]", ""));
         }
+        psm = new PSM(specFile, index, title, charge);
 
-        searchResult = new PSM(fileName, index);
-
-        /* A HACK, this is only for the case that (fileName = TITLE in the formated result) */
-        fileAndPsmMap.put(fileName, searchResult);
+        titleAndPsmMap.put(title, psm);
       }
     } else {
       resultFileReader.close();
@@ -49,14 +49,8 @@ public class SpikeInResult implements SearchResult{
     resultFileReader.close();
   }
 
-  private boolean isTsv(String resultFileName) {
-    return resultFileName.substring(resultFileName.lastIndexOf('.'), resultFileName.length())
-        .equals(".tsv");
-  }
-
   @Override
   public void writeUnidentifiedSpectrum(String spectrumFileName) throws IOException {
-    
     String unidentieidSpectrumFileName =
         spectrumFileName.substring(0, spectrumFileName.lastIndexOf('.')) + "_IdRemoved.mgf";
 
@@ -69,6 +63,7 @@ public class SpikeInResult implements SearchResult{
     String spectrumCharge = "";
     StringBuffer spectrum = null;
     int spectrumCount = 0;
+    int idSpectrumCount = 0;
 
     while ((specLine = spectrumFile.readLine()) != null) {
       if (specLine.startsWith("BEGIN")) {
@@ -93,35 +88,25 @@ public class SpikeInResult implements SearchResult{
 
         // if it's not existed in the result file, write the spectrum to the unidentified spectrum
         // file.
-        if (!fileAndPsmMap.containsKey(spectrumTitle)) {
+        if (!titleAndPsmMap.containsKey(spectrumTitle)) {
           unidentifiedSpectrumFile.print(new String(spectrum));
         } else {
-          // debug
-          // TODO: this is a bug. no data in resultList objects. It's because it's a hashmap. other
-          // option is using Set map?? 0329.
-          
-          //          SearchResult value = resultList.get(spectrumTitle);
-          //          String charge = value.charge;
-          //          System.out.println(charge);
-          //          
-          //          System.out.println("this spectrum is identified.");
-          //          System.out.println(spectrumCharge);
-          //          System.out.println( resultList.get(spectrumTitle));
-          //          System.out.println(spectrumTitle);
-          //          System.out.println( ((SearchResult)resultList.get(spectrumTitle)).title );
-
-          continue;
+          idSpectrumCount++;
         }
-      } else
+      } 
+      else{
         spectrum.append(specLine + "\n");
+      }
     }
-
+    
+    System.out.println("id Spectrum Count:" + idSpectrumCount);
     System.out.println("spectrum Count: " + spectrumCount);
     unidentifiedSpectrumFile.close();
     spectrumFile.close();
-
+    
   }
-
+  
+  
   /*
    * Check given string is Integer or not
    * 
@@ -151,5 +136,17 @@ public class SpikeInResult implements SearchResult{
     }
     return true;
   }
+
+  private boolean isTsv(String resultFileName) {
+    return resultFileName.substring(resultFileName.lastIndexOf('.'), resultFileName.length())
+        .equals(".tsv");
+  }
+
+  private void checkHeader(BufferedReader resultFileReader, String line) throws IOException {
+    if (line.startsWith("#")) {
+      resultFileReader.readLine();
+    }
+  }
+
 
 }
