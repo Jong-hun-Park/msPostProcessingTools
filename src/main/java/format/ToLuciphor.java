@@ -22,9 +22,12 @@ import java.util.List;
 public class ToLuciphor {
   static final boolean isMODplusFormat = true;
   static final String RESULT_FILE_DELIMITER = "\t";
+  static boolean isMsgfResult = false;
+  static boolean hasNtermTMT = true; //if this variable is true, add the TMT as a variable
+                                     //since luciphor2 doensn't support n-term fixed modification.
   
   public static void main(String[] args) {
-    String resultFileName = "[set6]1st_2nd_MSGF_TMT_Title.txt";
+    String resultFileName = "[set1]3rd_MODplus_TMT_TITLE_1stSelected" + ".txt";
     System.out.println("resultFile: " + resultFileName);
     
     try {
@@ -71,6 +74,8 @@ public class ToLuciphor {
     String modification     = "";
     String scanNum          = "";
     
+    double minusLogEvalue = -1;
+    
     // Result File Header
     String psmLine = resultFile.readLine();
     // Write Header
@@ -101,6 +106,9 @@ public class ToLuciphor {
       deltaMass        = Float.parseFloat(psmColumn[5]);
       score            = Integer.parseInt(psmColumn[6]);
       probability      = Double.parseDouble(psmColumn[7]);
+      
+      minusLogEvalue = -Math.log(probability);
+      
       peptideSequence  = psmColumn[8];
       protein          = psmColumn[9];
       modification     = psmColumn[10];
@@ -113,12 +121,22 @@ public class ToLuciphor {
       String[] splitedScanNum = scanNum.split("\\.");
       scanNum = splitedScanNum[1];
       
-      outputFile.write(spectrumFile   + "\t" +
-                       scanNum        + "\t" +
-                       charge         + "\t" +
-                       probability    + "\t" +
-                       stipPeptideSeq + "\t" +
-                       modSite        + "\n");
+      if (isMsgfResult) {        
+        outputFile.write(spectrumFile   + "\t" +
+            scanNum        + "\t" +
+            charge         + "\t" +
+            minusLogEvalue    + "\t" +
+            stipPeptideSeq + "\t" +
+            modSite        + "\n");
+      }
+      else { //modplus result
+        outputFile.write(spectrumFile   + "\t" +
+            scanNum        + "\t" +
+            charge         + "\t" +
+            probability    + "\t" +
+            stipPeptideSeq + "\t" +
+            modSite        + "\n");
+      }
     }
     
     resultFile.close();
@@ -184,6 +202,11 @@ public class ToLuciphor {
      */
     StringBuilder sb = new StringBuilder(6 * modSiteArray.size()); // 6 is for modification digit
                                                                    // (15.995)
+    
+    if (hasNtermTMT) {
+      sb.append("-100=+229.162932,"); //apply N-term fixed modification 
+    }
+    
     for (int i = 0; i < modSiteArray.size(); i++) {
       int modSite;
       
