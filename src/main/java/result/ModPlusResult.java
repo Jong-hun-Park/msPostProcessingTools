@@ -22,6 +22,9 @@ public class ModPlusResult {
   public String deltaScore; //luciphor deltaScore
   public String title;
   
+  public String luciphorSeq1;
+  public String luciphorSeq2;
+  
   public static String phosphoMass = "+79.966";
 
   public ModPlusResult(String spectrumFile, String index, String observedMW, String charge,
@@ -41,6 +44,9 @@ public class ModPlusResult {
     this.scanNum = scanNum;
     this.deltaScore = deltaScore;
     this.title = title;
+    
+    this.luciphorSeq1 = "-";
+    this.luciphorSeq2 = "-";
     
   }
 

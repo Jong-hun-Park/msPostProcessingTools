@@ -28,9 +28,9 @@ public class LuciphorToModplus {
 
   public static void main(String[] args) {
 
-    String rootPath = "./repo/LuciphorToModplus/modplus/RE_GBM0820_set1/";
+    String rootPath = "./repo/LuciphorToModplus/modplus/GBM_1108_set1_fixed/";
 
-    String luciphorResultFile = rootPath + "luciphor_results.20168월20-03_42_23.tsv";
+    String luciphorResultFile = rootPath + "luciphor_results.201611월09-08_19_17_nTermTmtFixed.tsv";
     String modoplusResultFile = rootPath + "[set1]3rd_MODplus_TMT_TITLE.txt";
 
     try {
@@ -59,8 +59,10 @@ public class LuciphorToModplus {
   private static void assignLuciphorToModplus(String luciphorResultFile, String modplusResultFile)
       throws IOException, IllegalArgumentException {
 
+//    String outputFile = modplusResultFile.substring(0, modplusResultFile.lastIndexOf("."))
+//        + "_phosphoLocalized_notZeroDelta.tsv";
     String outputFile = modplusResultFile.substring(0, modplusResultFile.lastIndexOf("."))
-        + "_phosphoLocalized_notZeroDelta.tsv";
+        + "_appliedLuciphor.tsv";
 
     BufferedReader luciphorReader = new BufferedReader(new FileReader(luciphorResultFile));
     BufferedReader modplusReader = new BufferedReader(new FileReader(modplusResultFile));
@@ -72,9 +74,12 @@ public class LuciphorToModplus {
 
     // Load ModPlus result File
     String line = modplusReader.readLine(); // Read header
-    String deltaScoreAddedHeader = line + "\t" + "DeltaScore"; // new result column for luciphor
+    String deltaScoreAddedHeader = line + "\t" + 
+                                   "Luciphor1" + "\t" +
+                                   "Luciphor2" + "\t" +
+                                   "DeltaScore"+ "\n"; // new result column for luciphor
                                                                // delta score.
-    modplusWriter.write(deltaScoreAddedHeader + "\n"); // Write header
+    modplusWriter.write(deltaScoreAddedHeader); // Write header
 
     // Modplus result file columns
     String spectrumFile = "";
@@ -112,9 +117,9 @@ public class LuciphorToModplus {
       protein = splitedResult[9];
       modification = splitedResult[10];
       scanNum = splitedResult[11]; // msgf
-      // scanNum = splitedResult[11].split("=")[1]; //modplus
-      // scanNum = splitedResult[11].split(" ")[0].split("=")[0]; //msgf merged
-      // scanNum = splitedResult[11].split(" ")[0].split("=")[1]; //modplus merged
+//      scanNum = splitedResult[11].split("=")[1]; //modplus
+//      scanNum = splitedResult[11].split(" ")[0].split("=")[0]; //msgf merged
+//      scanNum = splitedResult[11].split(" ")[0].split("=")[1]; //modplus merged
       scanNum = splitedResult[11].split(" ")[0]; // modplus
 
       title = splitedResult[11];
@@ -138,6 +143,7 @@ public class LuciphorToModplus {
     // luciphor result columns
     String specId = "";
     String predictedPep1 = "";
+    String predictedPep2 = "";
     String luciphorDeltaScore = "";
 
     line = luciphorReader.readLine(); // header
@@ -153,55 +159,24 @@ public class LuciphorToModplus {
 
       specId = splitedResult[0];
       predictedPep1 = splitedResult[2];
+      predictedPep2 = splitedResult[3];
       luciphorDeltaScore = splitedResult[7];
 
 
       // modplus scanNum is equal to luciphor result specId column
       if (modplusResultHM.containsKey(specId)) {
-        if (Float.parseFloat(luciphorDeltaScore) != 0.0) {
-          
+        //Format changed 16.11.08. modplus features, luciphor1, luciphor2, deltaScore
+        {
           ModPlusResult modpResult = modplusResultHM.get(specId);
           
-          // check if the phospho location is changed or not.
-          ArrayList<Integer> modplusPhosphoSite  = ModPlusResult.getPhosphoSite(modpResult);
-          ArrayList<Integer> luciphorPhosphoSite = getPhosphoSite(predictedPep1);
-          
-          assert modplusPhosphoSite.size() == luciphorPhosphoSite.size() : "shold be same";
-          
-          int sameSiteCount = countSamePhosphoSite(modplusPhosphoSite, luciphorPhosphoSite);
-          
-          // at least one site is changed, so change phospho site
-          if (sameSiteCount != modplusPhosphoSite.size()) {
-            modpResult = ModPlusResult.changePhosphoSite(modpResult, luciphorPhosphoSite);
-            changedSiteCount++;
-            
-            //write the changed psm to another file.
-            nonZeroDeltaPsmWriter.write(line + "\n");
-            
-          }
+          modpResult.luciphorSeq1 = getModFormatFromLuciphorPep(predictedPep1); 
+          modpResult.luciphorSeq2 = getModFormatFromLuciphorPep(predictedPep2);
           modpResult.deltaScore = luciphorDeltaScore;
-          modplusResultHM.put(specId, modpResult);
         }
-        else{ //if delta score is zero, do not change the site, only write deltaScore
-          zeroDeltaScoreCount++;
-          ModPlusResult modpResult = modplusResultHM.get(specId);
-          
-          // check if the phospho location is changed or not.
-          ArrayList<Integer> modplusPhosphoSite  = ModPlusResult.getPhosphoSite(modpResult);
-          ArrayList<Integer> luciphorPhosphoSite = getPhosphoSite(predictedPep1);
-          
-          assert modplusPhosphoSite.size() == luciphorPhosphoSite.size() : "shold be same";
-          
-          int sameSiteCount = countSamePhosphoSite(modplusPhosphoSite, luciphorPhosphoSite);
-          
-          // at least one site is changed, count possible change count
-          if (sameSiteCount != modplusPhosphoSite.size()) {
-            mightBeChangedSiteCount++;
-          }
-          
-          modpResult.deltaScore = luciphorDeltaScore;
-          modplusResultHM.put(specId, modpResult);
-        }
+        
+        
+        //Overwrite mopdlus peptide result to luciphor 1st ranked peptide, when deltaScore != 0
+//        overwriteModplusResult(nonZeroDeltaPsmWriter, line, modplusResultHM, specId, predictedPep1, luciphorDeltaScore);
         
       } else {
         System.err.println("there is a not matched luciphor result");
@@ -218,6 +193,7 @@ public class LuciphorToModplus {
           + "\t" + result.charge + "\t" + result.calculatedMW + "\t" + result.deltaMass + "\t"
           + result.score + "\t" + result.probability + "\t" + result.peptideSequence + "\t"
           + result.protein + "\t" + result.modification + "\t" + result.title + "\t"
+          + result.luciphorSeq1 + "\t" + result.luciphorSeq2 + "\t"
           + result.deltaScore + "\n");
     }
 
@@ -240,6 +216,67 @@ public class LuciphorToModplus {
     modplusWriter.close();
     log.close();
     nonZeroDeltaPsmWriter.close();
+  }
+
+  private static void overwriteModplusResult(PrintWriter nonZeroDeltaPsmWriter, String line,
+      HashMap<String, ModPlusResult> modplusResultHM, String specId, String predictedPep1,
+      String luciphorDeltaScore) {
+    if (Float.parseFloat(luciphorDeltaScore) != 0.0) {
+      
+      ModPlusResult modpResult = modplusResultHM.get(specId);
+      
+      // check if the phospho location is changed or not.
+      ArrayList<Integer> modplusPhosphoSite  = ModPlusResult.getPhosphoSite(modpResult);
+      ArrayList<Integer> luciphorPhosphoSite = getPhosphoSite(predictedPep1);
+      
+      assert modplusPhosphoSite.size() == luciphorPhosphoSite.size() : "shold be same";
+      
+      int sameSiteCount = countSamePhosphoSite(modplusPhosphoSite, luciphorPhosphoSite);
+      
+      // at least one site is changed, so change phospho site
+      if (sameSiteCount != modplusPhosphoSite.size()) {
+        modpResult = ModPlusResult.changePhosphoSite(modpResult, luciphorPhosphoSite);
+        changedSiteCount++;
+        
+        //write the changed psm to another file.
+        nonZeroDeltaPsmWriter.write(line + "\n");
+        
+      }
+      modpResult.deltaScore = luciphorDeltaScore;
+      modplusResultHM.put(specId, modpResult);
+    }
+    else{ //if delta score is zero, do not change the site, only write deltaScore
+      zeroDeltaScoreCount++;
+      ModPlusResult modpResult = modplusResultHM.get(specId);
+      
+      // check if the phospho location is changed or not.
+      ArrayList<Integer> modplusPhosphoSite  = ModPlusResult.getPhosphoSite(modpResult);
+      ArrayList<Integer> luciphorPhosphoSite = getPhosphoSite(predictedPep1);
+      
+      assert modplusPhosphoSite.size() == luciphorPhosphoSite.size() : "shold be same";
+      
+      int sameSiteCount = countSamePhosphoSite(modplusPhosphoSite, luciphorPhosphoSite);
+      
+      // at least one site is changed, count possible change count
+      if (sameSiteCount != modplusPhosphoSite.size()) {
+        mightBeChangedSiteCount++;
+      }
+      
+      modpResult.deltaScore = luciphorDeltaScore;
+      modplusResultHM.put(specId, modpResult);
+    }
+  }
+
+  private static String getModFormatFromLuciphorPep(String predictedPep1) {
+    String modRersidueAndIndexDictionary = "";
+    for (int i = 0; i < predictedPep1.length(); i++) {
+      char AA = predictedPep1.charAt(i);
+      if (AA == 's' || AA == 't' || AA == 'y') { //phosphorylated site
+        modRersidueAndIndexDictionary += Character.toUpperCase(AA) + Integer.toString(i) + " "; //one base.
+      }
+    }
+    
+    return modRersidueAndIndexDictionary;
   }
 
   private static int countSamePhosphoSite(ArrayList<Integer> modplusPhosphoSite,
