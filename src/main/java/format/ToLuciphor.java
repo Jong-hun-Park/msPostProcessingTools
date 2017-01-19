@@ -27,7 +27,8 @@ public class ToLuciphor {
                                      //since luciphor2 doensn't support n-term fixed modification.
   
   public static void main(String[] args) {
-    String resultFileName = "[set1]3rd_MODplus_TMT_TITLE_1stSelected" + ".txt";
+    String resultFileName = "[set6]1st_2nd_MSGF_TMT_Title"
+                             + ".txt";
     System.out.println("resultFile: " + resultFileName);
     
     try {
@@ -166,6 +167,9 @@ public class ToLuciphor {
   private static String getModSite(String peptideSequence, String modification) {
     // When no modification
     if (modification.equals("")) {
+      if (hasNtermTMT) {
+        return "-100=+229.162932"; //apply N-term TMT fixed modification 
+      }
       return "";
     }
     
