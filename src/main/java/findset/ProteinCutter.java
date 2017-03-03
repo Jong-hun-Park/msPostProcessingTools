@@ -23,7 +23,7 @@ public class ProteinCutter {
    *
    * @return a set of peptide sequences (considered the given constraints)
    */
-  public ArrayList<String> findFullyTrypticPeptideSequences(String proteinSeq, int missCleavageSize, int minPeptideLength){
+  public ArrayList<String> getFullyTrypticPeptideSequences(String proteinSeq, int missCleavageSize, int minPeptideLength){
     ArrayList<String> fullyTrypticSequences = new ArrayList<String>();
     ArrayList<Integer> trypticIndices = new ArrayList<Integer>();
     char[] proteinSequence = proteinSeq.toCharArray();
