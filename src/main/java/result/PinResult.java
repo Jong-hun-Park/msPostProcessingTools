@@ -61,7 +61,7 @@ public class PinResult implements SearchResult {
         sb.append(specLine + "\n");
       } else if (specLine.startsWith("TITLE")) {
         spectrumTitle = specLine.trim().split("\\=")[1];
-        scanKey = getScanKeyFromSpecTitle(spectrumTitle);
+        scanKey = spectrumTitle; // In pin file, scanKey is the spectrumTitle
         sb.append(specLine + "\n");
       } else if (specLine.startsWith("CHARGE")) {
         spectrumCharge = specLine.trim().split("\\=")[1];
@@ -94,10 +94,18 @@ public class PinResult implements SearchResult {
 
 
   public static String getScanKey(String psmLine) {
+    // Pin file example
+    // UPS1_5000amol_R1_5_2_1
     String[] splited = psmLine.split("\t");
     String psmId = splited[0];
-    String scanKey = psmId.split("_")[3];
-
+    String[] splitedPsmId = psmId.split("_");
+    
+    String scanNum = splitedPsmId[3];
+    String charge = splitedPsmId[4];
+    
+    String scanKey = splitedPsmId[0] + "_" + splitedPsmId[1] + "_"+ splitedPsmId[2]
+                     + "." + scanNum + "." + scanNum
+                     + "." + charge;
     return scanKey;
   }
 
