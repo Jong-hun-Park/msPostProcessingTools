@@ -14,6 +14,8 @@ public class PinResult implements SearchResult {
 
   private static BufferedReader percolResult;
   private static HashSet<String> scanKeySet;
+  private BufferedReader specReader;
+  private PrintWriter unidentifiedSpectrumFile;
 
   @Override
   public void loadResultFile(String resultFileName) throws IOException {
@@ -26,6 +28,7 @@ public class PinResult implements SearchResult {
     psmLine = percolResult.readLine();
 
     String scanKey = "";
+    scanKeySet = new HashSet<String>();
     while ((psmLine = percolResult.readLine()) != null) {
       scanKey = getScanKey(psmLine);
       scanKeySet.add(scanKey);
@@ -34,22 +37,21 @@ public class PinResult implements SearchResult {
 
   @Override
   public void writeUnidentifiedSpectrum(String spectrumFileName) throws IOException {
-    // Read Spectrum file (mgf format), and get the scanNumber from them
-    // If the scanNumber is in the HashSet, skip the spectrum, otherwise write the spectrum.
-    BufferedReader specReader = new BufferedReader(new FileReader(spectrumFileName));
+    specReader = new BufferedReader(new FileReader(spectrumFileName));
 
     String unidentieidSpectrumFileName =
         spectrumFileName.substring(0, spectrumFileName.lastIndexOf('.')) + "_IdRemoved.mgf";
-    PrintWriter unidentifiedSpectrumFile =
-        new PrintWriter(new BufferedWriter(new FileWriter(unidentieidSpectrumFileName)));
+    unidentifiedSpectrumFile = new PrintWriter(new BufferedWriter(new FileWriter(unidentieidSpectrumFileName)));
 
     String specLine = "";
     StringBuffer sb = new StringBuffer();
 
     int spectrumCount = 0;
+    int unIdentifiedCount = 0;
     String scanKey = null;
     String spectrumTitle;
     String spectrumCharge;
+    
     while ((specLine = specReader.readLine()) != null) {
 
       if (specLine.startsWith("BEGIN")) {
@@ -69,21 +71,25 @@ public class PinResult implements SearchResult {
 
         // if it's not existed in the result file, write the spectrum to the unidentified spectrum file.
         if (!scanKeySet.contains(scanKey)) {
-          System.out.println(spectrumCount);
+          unIdentifiedCount++;
           unidentifiedSpectrumFile.print(new String(sb)); //write the spectrum
         }
         else {
-          System.out.println("It is a matched spectra" + scanKey);
+//          System.out.println("It is a matched spectra " + scanKey);
         }
       } else //when it is just a peak (mz intensity)
         sb.append(specLine + "\n");
     }
+    
+    System.out.println("Total Spectrum Count: " + spectrumCount);
+    System.out.println("UnIdentified Spectrum Count: " + unIdentifiedCount);
 
   }
 
   private static String getScanKeyFromSpecTitle(String spectrumTitle) {
+    // Title example)
     // TITLE=UPS1_5000amol_R1.5.5.2
-    return spectrumTitle.split(".")[1];
+    return spectrumTitle.split("\\.")[1];
   }
 
 
@@ -91,8 +97,6 @@ public class PinResult implements SearchResult {
     String[] splited = psmLine.split("\t");
     String psmId = splited[0];
     String scanKey = psmId.split("_")[3];
-
-    System.out.println(scanKey);
 
     return scanKey;
   }
