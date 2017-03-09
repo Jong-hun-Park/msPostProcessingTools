@@ -15,7 +15,7 @@ public class PinResult implements SearchResult {
   private static BufferedReader percolResult;
   private static HashSet<String> scanKeySet;
   private BufferedReader specReader;
-  private PrintWriter unidentifiedSpectrumFile;
+  private BufferedWriter unidSpecWriter;
 
   @Override
   public void loadResultFile(String resultFileName) throws IOException {
@@ -41,20 +41,20 @@ public class PinResult implements SearchResult {
 
     String unidentieidSpectrumFileName =
         spectrumFileName.substring(0, spectrumFileName.lastIndexOf('.')) + "_IdRemoved.mgf";
-    unidentifiedSpectrumFile = new PrintWriter(new BufferedWriter(new FileWriter(unidentieidSpectrumFileName)));
+    unidSpecWriter = new BufferedWriter(new FileWriter(unidentieidSpectrumFileName));
 
     String specLine = "";
     StringBuffer sb = new StringBuffer();
 
     int spectrumCount = 0;
     int unIdentifiedCount = 0;
-    String scanKey = null;
-    String spectrumTitle;
-    String spectrumCharge;
+    String scanKey = "";
+    String spectrumTitle = "";
+    String spectrumCharge = "";
     
     while ((specLine = specReader.readLine()) != null) {
 
-      if (specLine.startsWith("BEGIN")) {
+      if (specLine.startsWith("BEGIN IONS")) {
         spectrumCount++;
         // initialize spectrum buffer
         sb.setLength(0);
@@ -66,13 +66,13 @@ public class PinResult implements SearchResult {
       } else if (specLine.startsWith("CHARGE")) {
         spectrumCharge = specLine.trim().split("\\=")[1];
         sb.append(specLine + "\n");
-      } else if (specLine.startsWith("END")) {
+      } else if (specLine.startsWith("END IONS")) {
         sb.append(specLine + "\n");
 
         // if it's not existed in the result file, write the spectrum to the unidentified spectrum file.
         if (!scanKeySet.contains(scanKey)) {
           unIdentifiedCount++;
-          unidentifiedSpectrumFile.print(new String(sb)); //write the spectrum
+          unidSpecWriter.write(new String(sb)); //write the spectrum
         }
         else {
 //          System.out.println("It is a matched spectra " + scanKey);
@@ -80,6 +80,9 @@ public class PinResult implements SearchResult {
       } else //when it is just a peak (mz intensity)
         sb.append(specLine + "\n");
     }
+    
+    specReader.close();
+    unidSpecWriter.close();
     
     System.out.println("Total Spectrum Count: " + spectrumCount);
     System.out.println("UnIdentified Spectrum Count: " + unIdentifiedCount);
