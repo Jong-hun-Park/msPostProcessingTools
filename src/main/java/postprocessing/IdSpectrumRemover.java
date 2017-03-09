@@ -4,10 +4,8 @@ import java.io.IOException;
 
 import parameter.Arguments;
 import parameter.ArgumentsParser;
-import result.MsgfPlusResult;
-import result.PinResult;
 import result.SearchResult;
-import result.SpikeInResult;
+import result.SearchResultFactory;
 
 /*
  * Remove Identified Spectrum from the given spectrum file and Make an unidentified spectrum
@@ -28,20 +26,8 @@ public class IdSpectrumRemover {
     Arguments arguments = new Arguments(argsParser);
 
     SearchResult searchResult = null;
-    if (arguments.getResultFormat().isSpikeIn()) {
-      searchResult = new SpikeInResult();
-    }
-    else if (arguments.getResultFormat().isMsgf()) {
-      searchResult = new MsgfPlusResult();
-    } 
-    else if (arguments.getResultFormat().isPin()) {
-      searchResult = new PinResult();
-    }
-    else {
-      System.err.println("Other format is not avaialble yet");
-      System.exit(-1);
-    }
-
+    searchResult = SearchResultFactory.create(arguments.getResultFormat());
+   
     // 1. read result file and store the information
     searchResult.loadResultFile(arguments.getResultFileName());
     // 2. read spectrum file and check if the spectrum is identified or not. if not, write the
