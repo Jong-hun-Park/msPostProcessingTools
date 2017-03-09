@@ -5,6 +5,7 @@ import java.io.IOException;
 import parameter.Arguments;
 import parameter.ArgumentsParser;
 import result.MsgfPlusResult;
+import result.PinResult;
 import result.SearchResult;
 import result.SpikeInResult;
 
@@ -17,20 +18,24 @@ import result.SpikeInResult;
  * @author Jonghun Park
  **/
 
-//TODO: change this class name, not a verb form, but a Noun form.
+//TODO: 2016.11.11 charge까지 key로 사용해서 지울 것.
 public class IdSpectrumRemover {
 
   public static void main(String[] args) throws IOException {
     ArgumentsParser argsParser = new ArgumentsParser(args);
-    argsParser.readOptionList();
+    argsParser.readIdRemoverOptionList();
     
     Arguments arguments = new Arguments(argsParser);
 
     SearchResult searchResult = null;
     if (arguments.getResultFormat().isSpikeIn()) {
       searchResult = new SpikeInResult();
-    } else if (arguments.getResultFormat().isMsgf()) {
+    }
+    else if (arguments.getResultFormat().isMsgf()) {
       searchResult = new MsgfPlusResult();
+    } 
+    else if (arguments.getResultFormat().isPin()) {
+      searchResult = new PinResult();
     }
     else {
       System.err.println("Other format is not avaialble yet");
