@@ -13,6 +13,9 @@ public class SearchResultFactory {
       else if (resultFormat.isPin()) {
         return new PinResult();
       }
+      else if (resultFormat.isPinMsgf()) {
+        return new PinMsgfResult();
+      }
       else {
         System.err.println("Other format is not avaialble");
         System.exit(-1);

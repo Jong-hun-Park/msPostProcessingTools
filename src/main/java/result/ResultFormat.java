@@ -4,7 +4,9 @@ public enum ResultFormat {
   SPIKEIN,
   MODPLUS,
   MSGF,
-  PIN;
+  PIN,
+  PINMSGF;
+  
   
   public boolean isSpikeIn() {
     return this == SPIKEIN;
@@ -16,6 +18,10 @@ public enum ResultFormat {
 
   public boolean isPin() {
     return this == PIN;
+  }
+
+  public boolean isPinMsgf() {
+    return this == PINMSGF;
   }
   
 }
