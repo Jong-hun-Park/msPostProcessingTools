@@ -20,14 +20,16 @@ import java.util.List;
  */
 
 public class ToLuciphor {
-  static final boolean isMODplusFormat = true;
+  
+  static final boolean isMODplusFormat = true; //this only effect to the peptide format Pre.Seq.Post
+                                              //in GBM, it's always true.
   static final String RESULT_FILE_DELIMITER = "\t";
-  static boolean isMsgfResult = false;
+  static boolean isMsgfResult;
   static boolean hasNtermTMT = true; //if this variable is true, add the TMT as a variable
                                      //since luciphor2 doensn't support n-term fixed modification.
   
   public static void main(String[] args) {
-    String resultFileName = "[set6]1st_2nd_MSGF_TMT_Title"
+    String resultFileName = "[set7]MODplus_1stSelected"
                              + ".txt";
     System.out.println("resultFile: " + resultFileName);
     
@@ -95,7 +97,6 @@ public class ToLuciphor {
       
       psmColumn = psmLine.trim().split(RESULT_FILE_DELIMITER);
       
-      
       String[] splitedSpectrumFile = psmColumn[0].split("/"); // in case of psmColumn has a file
                                                               // path not just a file name
       spectrumFile = splitedSpectrumFile[splitedSpectrumFile.length - 1]; // last index should be
@@ -122,7 +123,7 @@ public class ToLuciphor {
       String[] splitedScanNum = scanNum.split("\\.");
       scanNum = splitedScanNum[1];
       
-      if (isMsgfResult) {        
+      if (isMsgfResult(resultFileName)) {        
         outputFile.write(spectrumFile   + "\t" +
             scanNum        + "\t" +
             charge         + "\t" +
@@ -142,6 +143,10 @@ public class ToLuciphor {
     
     resultFile.close();
     outputFile.close();
+  }
+
+  private static boolean isMsgfResult(String resultFileName) {
+    return resultFileName.toLowerCase().contains("msgf");
   }
 
   private static String getStripPeptideSeq(String peptideSequence) {
@@ -168,7 +173,8 @@ public class ToLuciphor {
     // When no modification
     if (modification.equals("")) {
       if (hasNtermTMT) {
-        return "-100=+229.162932"; //apply N-term TMT fixed modification 
+        //TODO: this is a hack
+        return "-100=+229.162932"; //apply N-term TMT fixed modification
       }
       return "";
     }
