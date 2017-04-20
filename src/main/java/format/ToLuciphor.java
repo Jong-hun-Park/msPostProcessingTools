@@ -24,12 +24,12 @@ public class ToLuciphor {
   static final boolean isMODplusFormat = true; //this only effect to the peptide format Pre.Seq.Post
                                               //in GBM, it's always true.
   static final String RESULT_FILE_DELIMITER = "\t";
-  static boolean isMsgfResult;
+  static boolean isMsgfResult = false;
   static boolean hasNtermTMT = true; //if this variable is true, add the TMT as a variable
                                      //since luciphor2 doensn't support n-term fixed modification.
   
   public static void main(String[] args) {
-    String resultFileName = "[set7]MODplus_1stSelected"
+    String resultFileName = "[set6]1st_2nd_MSGF_TMT_TITLE"
                              + ".txt";
     System.out.println("resultFile: " + resultFileName);
     
@@ -89,6 +89,15 @@ public class ToLuciphor {
                      "peptide" + "\t" +
                      "modSites"+ "\n");
     
+    // Check whether the result is from MS-GF+ or MODplus
+    // It assume that there will be only two result formats!
+    if (isMsgfResult(resultFileName)) {
+      System.out.println("This result file is msgf foramt, so -logEvalue is used for PSMscore");
+      isMsgfResult = true;
+    } else {
+      System.out.println("This result file is modplus foramt, so probability is used for PSMscore");
+    }
+    
     String[] psmColumn = null;
     String stipPeptideSeq = "";
     String modSite = "";
@@ -123,7 +132,8 @@ public class ToLuciphor {
       String[] splitedScanNum = scanNum.split("\\.");
       scanNum = splitedScanNum[1];
       
-      if (isMsgfResult(resultFileName)) {        
+      if (isMsgfResult) {    
+
         outputFile.write(spectrumFile   + "\t" +
             scanNum        + "\t" +
             charge         + "\t" +
