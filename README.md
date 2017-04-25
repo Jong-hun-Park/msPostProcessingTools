@@ -1,9 +1,9 @@
-#Tool List
+##Tool List
 
-1. Make unidentified spectra
-2. Find fully tryptic peptides (get the count of it)
-3. Chage MODplus format to Luciphor input format
+1. Remove identified spectra from spectrum file
+2. Find fully tryptic peptides from DB
+3. Change MODplus format to Luciphor input format
 
--TODO list-
+-Not implemented-
 4. Target-Decoy score based thresholding
-5. Pattern Mathing
+5. Model-based score thresholding
